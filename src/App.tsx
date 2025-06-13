@@ -47,10 +47,9 @@ function App() {
 
   const activeTodos = todos.filter((todo) => !todo.completed);
 
-  // Sort: completed at top
   const sortedTodos = [...todos].sort((a, b) => {
     if (a.completed === b.completed) return 0;
-    return a.completed ? -1 : 1;
+    return a.completed ? -1 : 1; // ✅ completed first
   });
 
   const filteredTodos = sortedTodos.filter((todo) => {
