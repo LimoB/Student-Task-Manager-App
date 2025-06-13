@@ -1,7 +1,6 @@
 import { useState } from "react";
 import type { Todo } from "./types/todo";
 import Header from "./components/Header";
-import TodoInput from "./components/TodoInput";
 import TodoList from "./components/TodoList";
 import "./App.css";
 
@@ -46,7 +45,15 @@ function App() {
     setTodos(reordered);
   };
 
-  const filteredTodos = todos.filter((todo) => {
+  const activeTodos = todos.filter((todo) => !todo.completed);
+
+  // Sort: completed at top
+  const sortedTodos = [...todos].sort((a, b) => {
+    if (a.completed === b.completed) return 0;
+    return a.completed ? -1 : 1;
+  });
+
+  const filteredTodos = sortedTodos.filter((todo) => {
     if (filter === "active") return !todo.completed;
     if (filter === "completed") return todo.completed;
     return true;
@@ -54,12 +61,10 @@ function App() {
 
   return (
     <div className="app">
-      <Header />
+      <Header addTodo={addTodo} />
 
       <main className="main">
         <div className="todo-container">
-          <TodoInput addTodo={addTodo} />
-
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="todos">
               {(provided) => (
@@ -69,13 +74,14 @@ function App() {
                   ref={provided.innerRef}
                 >
                   <TodoList todos={filteredTodos} toggleTodo={toggleTodo} />
+                  {provided.placeholder}
                 </ul>
               )}
             </Droppable>
           </DragDropContext>
 
           <div className="todo-footer">
-            <span>{todos.filter((t) => !t.completed).length} items left</span>
+            <span>{activeTodos.length} items left</span>
             <div className="filters">
               <button
                 onClick={() => setFilter("all")}
